@@ -1,5 +1,6 @@
 package cest.la.vie.persistence;
 
+import cest.la.vie.persistence.model.Session;
 import cest.la.vie.persistence.model.User;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,4 +15,6 @@ public class UserRepository implements PanacheRepository<User> {
     public Optional<User> findByPhone(String phone) {
         return find("phone_number", phone).firstResultOptional();
     }
+
+
 }
