@@ -1,62 +1,57 @@
 package cest.la.vie.rest;
 
-import cest.la.vie.persistence.SessionRepository;
-import cest.la.vie.persistence.UserRepository;
+import cest.la.vie.persistence.*;
+import cest.la.vie.service.*;
 import cest.la.vie.persistence.model.Session;
 import cest.la.vie.persistence.model.User;
-import cest.la.vie.service.EmailService;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 import java.util.Optional;
 
-@Path("/api/user")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@Path("/user")
 public class UserResource {
 
-    @Inject
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
-    @Inject
-    SessionRepository sessionRepository;
-
-    @Inject
-    EmailService emailService;
-
-    @POST
-    @Path("/register")
-    public Response register(User user) {
-        // Controllo se l'email è già registrata
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return Response.status(Response.Status.CONFLICT).entity("Email già registrata").build();
-        }
-
-        // Persisti l'utente nel database
-        userRepository.persist(user);
-
-        // Crea una sessione di verifica e salvala
-        Session verificationSession = new Session(user);
-        sessionRepository.persist(verificationSession);
-
-        // Invia l'email di verifica con la sessionKey
-        emailService.sendVerificationEmail(user, verificationSession.getSessionKey());
-
-        return Response.status(Response.Status.CREATED).entity("Registrazione effettuata, verifica l'email").build();
+    public UserResource(UserRepository userRepository, SessionRepository sessionRepository, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     @GET
     @Path("/verify")
+    @Transactional
     public Response verify(@QueryParam("sessionKey") String sessionKey) {
         Optional<Session> optionalSession = sessionRepository.findBySessionKey(sessionKey);
         if (optionalSession.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Chiave di sessione non valida").build();
         }
+
         User user = optionalSession.get().getUser();
-        user.setVerified(true);  // Assicurati di avere un setter o un campo booleano per la verifica
+        // Cambio il flag per la verifica del utente
+        user.setVerified(true);
         userRepository.persist(user);
-        return Response.ok("Account verificato con successo").build();
+
+        // Elimina la sessione di verifica usata
+        sessionRepository.delete(optionalSession.get());
+
+        // Crea una nuova sessione di accesso
+        Session accessSession = new Session(user);
+        sessionRepository.persist(accessSession);
+
+        // Crea un cookie di sessione
+        NewCookie sessionCookie = new NewCookie("SESSION_ID", String.valueOf(accessSession.getSessionKey()), "/", null, null, NewCookie.DEFAULT_MAX_AGE, false);
+
+        // Restituisce la chiave di sessione di accesso
+        return Response.ok("Account verificato con successo, sessione di accesso creata")
+                .cookie(sessionCookie)
+                .build();
     }
+
 }

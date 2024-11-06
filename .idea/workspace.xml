@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e5a3c96-88f9-47e7-9ba7-b350d6beb004" name="Changes" comment="" />
+    <list default="true" id="5e5a3c96-88f9-47e7-9ba7-b350d6beb004" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/cestLaVieApi/src/main/java/cest/la/vie/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cestLaVieApi/src/main/java/cest/la/vie/persistence/model/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/cestLaVieApi/src/main/java/cest/la/vie/persistence/model/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cestLaVieApi/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/cestLaVieApi/src/main/resources/application.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,9 +18,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2oOJpCtwDq8PjtjDJGoff9tzTUC" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -20,10 +31,16 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "develop",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/pw4_gruppo6_backend",
+    "last_opened_file_path": "C:/PW4/PW4_Gruppo6_Backend/.idea",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -31,8 +48,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+        <option value="jdk-21.0.2-temurin-21.0.2-4caba194b151-7da56cdf" />
       </set>
     </attachedChunks>
   </component>
@@ -45,6 +61,9 @@
       <option name="presentableId" value="Default" />
       <updated>1730734869044</updated>
       <workItem from="1730734870251" duration="228000" />
+      <workItem from="1730815305659" duration="2492000" />
+      <workItem from="1730817919413" duration="101000" />
+      <workItem from="1730818076620" duration="17000" />
     </task>
     <servers />
   </component>
