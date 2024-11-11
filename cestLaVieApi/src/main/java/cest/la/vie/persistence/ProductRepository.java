@@ -16,8 +16,11 @@ public class ProductRepository implements PanacheRepository<Product> {
         return list("category.name LIKE ?1", "%" + categoryName + "%");
     }
 
-    public List<Product> findByName(String name) {
+    public List<Product> findBySimilarName(String name) {
         return list("name LIKE ?1", "%" + name + "%");
+    }
+    public Product findByName(String name) {
+        return find("name", name).firstResult();
     }
 
     public void addProduct(Product product) {

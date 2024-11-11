@@ -69,7 +69,7 @@ public class AuthenticationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response register(JsonObject loginRequest){
+    public Response login(JsonObject loginRequest){
         String email = loginRequest.getString("email", null); // Restituisce null se la chiave non esiste
         String phoneNumber = loginRequest.getString("phoneNumber", null); // Restituisce null se la chiave non esiste
         String password = loginRequest.getString("password", null); // Aggiungi un campo per la password
