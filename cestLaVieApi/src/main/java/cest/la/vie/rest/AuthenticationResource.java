@@ -4,31 +4,33 @@ import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.UserRepository;
 import cest.la.vie.persistence.model.Session;
 import cest.la.vie.persistence.model.User;
-import cest.la.vie.service.EmailService;
-import cest.la.vie.service.UserService;
+import cest.la.vie.service.*;
 import jakarta.json.JsonObject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import cest.la.vie.service.HashCalculator;
 
 
 @Path("/auth")
 public class AuthenticationResource {
     private final UserRepository userRepository;
-    private final SessionRepository sessionRepository;
+
+    private final SessionService sessionService;
     private final EmailService emailService;
     private final HashCalculator hashCalculator;
     private final UserService userService;
 
-    public AuthenticationResource(UserRepository userRepository, SessionRepository sessionRepository, EmailService emailService, HashCalculator hashCalculator, UserService userService) {
+    private final AuthenticationService authenticationService;
+
+    public AuthenticationResource(UserRepository userRepository,  SessionService sessionService, EmailService emailService, HashCalculator hashCalculator, UserService userService, AuthenticationService authenticationService) {
         this.userRepository = userRepository;
-        this.sessionRepository = sessionRepository;
+        this.sessionService = sessionService;
         this.emailService = emailService;
         this.hashCalculator=hashCalculator;
         this.userService=userService;
+        this.authenticationService = authenticationService;
     }
 
 
@@ -54,9 +56,8 @@ public class AuthenticationResource {
         // Persisti l'utente nel database
         userRepository.persist(user);
 
-        // Crea una sessione di verifica e salvala
-        Session verificationSession = new Session(user);
-        sessionRepository.persist(verificationSession);
+        // Crea una sessione di verifica
+        Session verificationSession =sessionService.createSession(user);
 
         // Invia l'email di verifica con la sessionKey
         emailService.sendVerificationEmail(user, verificationSession.getSessionKey());
@@ -79,26 +80,18 @@ public class AuthenticationResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Email o numero di telefono devono essere forniti").build();
         }
 
-        User user=null;
-        // Trova l'utente dall'email o dal il numero di telefono
-        if (phoneNumber != null && !phoneNumber.isEmpty()) {
-            user = userRepository.findByPhone(phoneNumber).get();
-        } else if (email != null && !email.isEmpty()) {
-            user = userRepository.findByEmail(email).get();
-        }else{
-            return Response.status(Response.Status.BAD_REQUEST).entity("Credenziali sbagliate").build();
-        }
+        // Prende l'utente dal db
+        User user=authenticationService.takeUserfromLoginRequest(email,phoneNumber);
 
         // Verifica se l'utente è verificato
         if(!user.isVerified()){
             return Response.status(Response.Status.BAD_REQUEST).entity("Utente non verificato").build();
         }
 
-        //Verifica se la password dell'utente è uguale alla password inserita
-        if((user.getPassword()).equals(hashCalculator.calculateHash(password))){
-            // Crea una sessione di verifica e salvala
-            Session accessSession = new Session(user);
-            sessionRepository.persist(accessSession);
+        // Verifica se la password dell'utente è uguale alla password inserita
+        if(authenticationService.verifyPassword(user,password)){
+            // Crea una sessione di accesso e salvala
+            Session accessSession =sessionService.createSession(user);
             // Crea cookie di sessione per la risposta frontend
             NewCookie sessionCookie = new NewCookie("SESSION_ID", String.valueOf(accessSession.getSessionKey()), "/", null, null, NewCookie.DEFAULT_MAX_AGE, false);
             return Response.status(Response.Status.ACCEPTED).cookie(sessionCookie).entity("Login effettuata, ciao "+user.getName()).build();
