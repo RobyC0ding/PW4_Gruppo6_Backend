@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class ProductHasIngredientId implements Serializable {
-    private int product;
-    private int ingredient;
+    private Long product;
+    private Long ingredient;
 
     // hashCode e equals per l'ID composto
     @Override

@@ -1,12 +1,15 @@
 package cest.la.vie.rest;
 
 import cest.la.vie.persistence.IngredientRepository;
+import cest.la.vie.persistence.ProductHasIngredientRepository;
 import cest.la.vie.persistence.ProductRepository;
 import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.model.*;
+import cest.la.vie.rest.model.ProductResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,12 +45,16 @@ public class ProductResource {
                 products = productRepository.findBySimilarName(name);
             } else {
                 // Restituisci tutti i prodotti se non ci sono parametri
-
-                //TODO::devo aggiungere alla risposta ingredienti e devono essere divisi in categoria
                 products = productRepository.findAllProducts();
             }
+            List<ProductResponse> responses=new ArrayList<>();
+            for(Product product: products){
+                List<Ingredient> ingredients = productHasIngredientRepository.findIngredientsByProduct(product);
+                ProductResponse response= new ProductResponse(product,ingredients);
+                responses.add(response);
+            }
 
-            return Response.status(Response.Status.OK).entity(products).build();
+            return Response.status(Response.Status.OK).entity(responses).build();
 
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -63,7 +70,9 @@ public class ProductResource {
         if (product == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
         }
-        return Response.ok(product).build();
+        List<Ingredient> ingredients = productHasIngredientRepository.findIngredientsByProduct(product);
+        ProductResponse response= new ProductResponse(product,ingredients);
+        return Response.ok(response).build();
     }
 
     @POST
@@ -174,18 +183,6 @@ public class ProductResource {
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to delete product: " + e.getMessage()).build();
         }
-    }
-
-    @GET
-    @Path("/{id}/ingredient")
-    public Response getIngredientsByProduct(@PathParam("id") Long productId) {
-        Product product = Product.findById(productId);
-        if (product == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
-        }
-
-        List<ProductHasIngredient> ingredients = productHasIngredientRepository.findIngredientsByProduct(product);
-        return Response.ok(ingredients).build();
     }
 
     // @POST per aggiungere un ingrediente a un prodotto

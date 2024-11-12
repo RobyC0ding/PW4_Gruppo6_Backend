@@ -1,4 +1,4 @@
-package cest.la.vie.persistence.model;
+package cest.la.vie.persistence;
 
 import cest.la.vie.persistence.model.ProductHasIngredient;
 import cest.la.vie.persistence.model.Product;
@@ -10,8 +10,11 @@ import java.util.List;
 @ApplicationScoped
 public class ProductHasIngredientRepository implements PanacheRepository<ProductHasIngredient> {
 
-    public List<ProductHasIngredient> findIngredientsByProduct(Product product) {
-        return list("product", product);
+    public List<Ingredient> findIngredientsByProduct(Product product) {
+        return getEntityManager().createQuery(
+                        "SELECT phi.ingredient FROM ProductHasIngredient phi WHERE phi.product = :product", Ingredient.class)
+                .setParameter("product", product)
+                .getResultList();
     }
 
     public void addIngredientToProduct(ProductHasIngredient productHasIngredient) {
@@ -21,5 +24,5 @@ public class ProductHasIngredientRepository implements PanacheRepository<Product
     public void removeIngredientFromProduct(Product product, Ingredient ingredient) {
         delete("product = ?1 and ingredient = ?2", product, ingredient);
     }
-    
+
 }
