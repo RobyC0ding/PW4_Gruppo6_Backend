@@ -16,6 +16,11 @@ public class Product extends PanacheEntityBase {
 
     @Column(name = "quantity", nullable = true)
     private int quantity;
+    @Column(name = "price", nullable = true)
+    private double price;
+
+    @Column(name = "image_link", nullable = true)
+    private String image_link;
 
     @Column(name = "desciption", columnDefinition = "MEDIUMTEXT")
     private String description;
