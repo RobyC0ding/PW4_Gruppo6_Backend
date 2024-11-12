@@ -9,7 +9,7 @@ public class User extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // o GenerationType.AUTO
     @Column(name="id", nullable = false)
-    private Long id;
+    private Integer id;
     @Column(name = "email", length = 255)
     private String email;
 
@@ -45,11 +45,11 @@ public class User extends PanacheEntityBase {
         C  // Customer
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
