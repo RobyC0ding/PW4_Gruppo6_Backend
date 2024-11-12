@@ -9,8 +9,13 @@ import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class EmailService {
-    @Inject
-    Mailer mailer;
+
+    private final Mailer mailer;
+
+    public EmailService(Mailer mailer) {
+        this.mailer = mailer;
+    }
+
 
     public void sendVerificationEmail(User user, String sessionKey) {
         String verificationLink = "http://localhost:8080/user/verify?sessionKey=" + sessionKey;

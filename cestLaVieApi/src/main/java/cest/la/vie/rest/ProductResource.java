@@ -1,10 +1,9 @@
 package cest.la.vie.rest;
 
+import cest.la.vie.persistence.IngredientRepository;
 import cest.la.vie.persistence.ProductRepository;
 import cest.la.vie.persistence.SessionRepository;
-import cest.la.vie.persistence.model.Product;
-import cest.la.vie.persistence.model.Session;
-import cest.la.vie.persistence.model.User;
+import cest.la.vie.persistence.model.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
@@ -17,10 +16,16 @@ public class ProductResource {
     private final ProductRepository productRepository;
     private final SessionRepository sessionRepository;
 
-    public ProductResource(ProductRepository productRepository, SessionRepository sessionRepository) {
+    private final ProductHasIngredientRepository productHasIngredientRepository;
+    private final IngredientRepository ingredientRepository;
+
+    public ProductResource(ProductRepository productRepository, SessionRepository sessionRepository, ProductHasIngredientRepository productHasIngredientRepository, IngredientRepository ingredientRepository) {
         this.productRepository = productRepository;
         this.sessionRepository = sessionRepository;
+        this.productHasIngredientRepository = productHasIngredientRepository;
+        this.ingredientRepository = ingredientRepository;
     }
+
 
     @GET
     @Path("/all")
@@ -37,6 +42,8 @@ public class ProductResource {
                 products = productRepository.findBySimilarName(name);
             } else {
                 // Restituisci tutti i prodotti se non ci sono parametri
+
+                //TODO::devo aggiungere alla risposta ingredienti e devono essere divisi in categoria
                 products = productRepository.findAllProducts();
             }
 
@@ -47,6 +54,16 @@ public class ProductResource {
                     .entity("Error retrieving products: " + e.getMessage())
                     .build();
         }
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response get(@PathParam("id") Long id){
+        Product product = productRepository.findById(id);
+        if (product == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
+        }
+        return Response.ok(product).build();
     }
 
     @POST
@@ -159,5 +176,57 @@ public class ProductResource {
         }
     }
 
+    @GET
+    @Path("/{id}/ingredient")
+    public Response getIngredientsByProduct(@PathParam("id") Long productId) {
+        Product product = Product.findById(productId);
+        if (product == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
+        }
+
+        List<ProductHasIngredient> ingredients = productHasIngredientRepository.findIngredientsByProduct(product);
+        return Response.ok(ingredients).build();
+    }
+
+    // @POST per aggiungere un ingrediente a un prodotto
+    @POST
+    @Path("/{id}/addIngredient/{ingredientId}")
+    public Response addIngredientToProduct(@PathParam("id") Long productId, @PathParam("ingredientId") Long ingredientId) {
+        Product product = Product.findById(productId);
+        if (product == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
+        }
+
+        Ingredient ingredient = ingredientRepository.findById(ingredientId);
+        if (ingredient == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Ingredient not found").build();
+        }
+
+        // Crea una relazione ProductHasIngredient
+        ProductHasIngredient productHasIngredient = new ProductHasIngredient();
+        productHasIngredient.setProduct(product);
+        productHasIngredient.setIngredient(ingredient);
+
+        productHasIngredientRepository.addIngredientToProduct(productHasIngredient);
+        return Response.status(Response.Status.CREATED).entity(productHasIngredient).build();
+    }
+
+    // @DELETE per rimuovere un ingrediente da un prodotto
+    @DELETE
+    @Path("{id}/removeIngredient/{ingredientId}")
+        public Response deleteIngredientFromProduct(@PathParam("id") Long productId, @PathParam("ingredientId") Long ingredientId) {
+        Product product = Product.findById(productId);
+        if (product == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Product not found").build();
+        }
+
+        Ingredient ingredient = ingredientRepository.findById(ingredientId);
+        if (ingredient == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Ingredient not found").build();
+        }
+
+        productHasIngredientRepository.removeIngredientFromProduct(product, ingredient);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 
 }
