@@ -59,8 +59,10 @@ public class AuthenticationResource {
         // Crea una sessione di verifica
         Session verificationSession =sessionService.createSession(user);
 
-        // Invia l'email di verifica con la sessionKey
-        emailService.sendVerificationEmail(user, verificationSession.getSessionKey());
+        // Invia l'email di verifica con la sessionKey o non invia niente se registrato con numero di telefono sarà l'admin ad accettare gli utenti
+        if(!user.getEmail().isEmpty() && user.getEmail()!=null){
+            emailService.sendVerificationEmail(user, verificationSession.getSessionKey());
+        }
 
         return Response.status(Response.Status.CREATED).entity("Registrazione effettuata, verifica l'email").build();
     }

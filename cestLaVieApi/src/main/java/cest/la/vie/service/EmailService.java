@@ -5,17 +5,19 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class EmailService {
 
+    private static final Logger LOGGER = Logger.getLogger(EmailService.class);
+
     private final Mailer mailer;
 
+    @Inject
     public EmailService(Mailer mailer) {
         this.mailer = mailer;
     }
-
 
     public void sendVerificationEmail(User user, String sessionKey) {
         String verificationLink = "http://localhost:8080/user/verify?sessionKey=" + sessionKey;
@@ -29,9 +31,9 @@ public class EmailService {
                     "Conferma la tua registrazione",
                     htmlContent)
             );
+            LOGGER.info("Email di verifica inviata con successo a: " + user.getEmail());
         } catch (Exception e) {
-            // Log dell'errore, se necessario
-            System.err.println("Errore nell'invio dell'email di verifica: " + e.getMessage());
+            LOGGER.error("Errore nell'invio dell'email di verifica a " + user.getEmail(), e);
         }
     }
 }
