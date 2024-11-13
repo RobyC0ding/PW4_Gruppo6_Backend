@@ -9,9 +9,7 @@ import cest.la.vie.rest.model.ProductResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Path("/product")
 public class ProductResource {
@@ -47,14 +45,33 @@ public class ProductResource {
                 // Restituisci tutti i prodotti se non ci sono parametri
                 products = productRepository.findAllProducts();
             }
-            List<ProductResponse> responses=new ArrayList<>();
-            for(Product product: products){
+
+            // Mappa per organizzare i prodotti per categoria
+            Map<String, Map<String, Object>> categoryMap = new LinkedHashMap<>();
+
+            for (Product product : products) {
                 List<Ingredient> ingredients = productHasIngredientRepository.findIngredientsByProduct(product);
-                ProductResponse response= new ProductResponse(product,ingredients);
-                responses.add(response);
+                ProductResponse response = new ProductResponse(product, ingredients);
+
+                String categoryName = product.getCategory().getName();
+                if (!categoryMap.containsKey(categoryName)) {
+                    // Crea una nuova categoria se non esiste
+                    Map<String, Object> categoryDetails = new LinkedHashMap<>();
+                    categoryDetails.put("id", product.getCategory().getId());
+                    categoryDetails.put("name", categoryName);
+                    categoryDetails.put("products", new ArrayList<ProductResponse>());
+                    categoryMap.put(categoryName, categoryDetails);
+                }
+
+                // Aggiungi il prodotto alla lista della categoria
+                List<ProductResponse> productList = (List<ProductResponse>) categoryMap.get(categoryName).get("products");
+                productList.add(response);
             }
 
-            return Response.status(Response.Status.OK).entity(responses).build();
+            // Converte la mappa in una lista finale
+            List<Map<String, Object>> finalResponse = new ArrayList<>(categoryMap.values());
+
+            return Response.status(Response.Status.OK).entity(finalResponse).build();
 
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -62,6 +79,7 @@ public class ProductResource {
                     .build();
         }
     }
+
 
     @GET
     @Path("/{id}")
