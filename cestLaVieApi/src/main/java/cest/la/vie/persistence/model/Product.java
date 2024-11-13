@@ -16,6 +16,15 @@ public class Product extends PanacheEntityBase {
 
     @Column(name = "quantity", nullable = true)
     private int quantity;
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     @Column(name = "price", nullable = true)
     private double price;
 
