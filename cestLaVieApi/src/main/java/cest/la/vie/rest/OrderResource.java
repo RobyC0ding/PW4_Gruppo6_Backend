@@ -25,7 +25,7 @@ public class OrderResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+
     public Response createOrder(@Context HttpHeaders httpHeaders, Order order) {
         try {
             // Prende il cookie di sessione
@@ -46,7 +46,7 @@ public class OrderResource {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("L'utente non ha il permesso di fare questa azione.").build();
             }
 
-            System.out.println(order);
+            System.out.println(order.toString());
             orderRepository.addOrder(order);
 
             return Response.status(Response.Status.CREATED).entity("Order created successfully!").build();

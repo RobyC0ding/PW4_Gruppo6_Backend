@@ -1,5 +1,6 @@
 package cest.la.vie.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import java.util.Set;
@@ -12,6 +13,7 @@ public class Product extends PanacheEntityBase {
     private Long id;
 
     @Column(name = "name", length = 45, nullable = false)
+    @JsonProperty("product_name")
     private String name;
 
     @Column(name = "quantity", nullable = true)

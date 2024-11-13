@@ -1,5 +1,6 @@
 package cest.la.vie.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -8,15 +9,19 @@ import org.bson.types.ObjectId;
 import java.time.Instant;
 import java.util.List;
 
+
 @MongoEntity(collection = "orders")
 public class Order extends PanacheMongoEntity {
 
 
     @BsonProperty("user_id")
+    @JsonProperty("user_id")
     private Integer sqluserId;
     @BsonProperty("pickup_date")
+    @JsonProperty("pickup_date")
     private Instant pickupDate;
     @BsonProperty("pickup_time")
+    @JsonProperty("pickup_time")
     private String pickupTime;
 
     public Instant getCreationDate() {
@@ -28,6 +33,7 @@ public class Order extends PanacheMongoEntity {
     }
 
     @BsonProperty("creation_date")
+    @JsonProperty("creation_date")
     private Instant creationDate;
     @BsonProperty("status")
     private String status;
@@ -121,5 +127,18 @@ public class Order extends PanacheMongoEntity {
         public String getValue() {
             return value;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "sqluserId=" + sqluserId +
+                ", pickupDate=" + pickupDate +
+                ", pickupTime='" + pickupTime + '\'' +
+                ", creationDate=" + creationDate +
+                ", status='" + status + '\'' +
+                ", comments=" + comments +
+                ", products=" + products +
+                '}';
     }
 }

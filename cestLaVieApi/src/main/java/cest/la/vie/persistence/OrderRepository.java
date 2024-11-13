@@ -11,9 +11,8 @@ import java.util.List;
 public class OrderRepository implements PanacheMongoRepository<Order> {
 
     // Aggiungi un ordine
-    public Order addOrder(Order order) {
+    public void addOrder(Order order) {
         persist(order);
-        return order;
     }
 
     // Modifica stato di un ordine
