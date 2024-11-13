@@ -30,8 +30,18 @@ public class Product extends PanacheEntityBase {
     @Column(name = "price", nullable = true)
     private double price;
 
+
+
     @Column(name = "image_link", nullable = true)
     private String image_link;
+
+    public String getImage_link() {
+        return image_link;
+    }
+
+    public void setImage_link(String image_link) {
+        this.image_link = image_link;
+    }
 
     @Column(name = "desciption", columnDefinition = "MEDIUMTEXT")
     private String description;
