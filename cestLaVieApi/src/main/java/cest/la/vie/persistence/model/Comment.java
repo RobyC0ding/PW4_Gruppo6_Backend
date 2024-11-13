@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class Comment extends PanacheMongoEntity {
 
-    public ObjectId userId;
+    public Integer userId;
     public ObjectId orderId;
     public String message;
     public LocalDateTime creationDate;
@@ -16,7 +16,7 @@ public class Comment extends PanacheMongoEntity {
         // Costruttore vuoto
     }
 
-    public Comment(ObjectId userId, ObjectId orderId, String message, LocalDateTime creationDate) {
+    public Comment(Integer userId, ObjectId orderId, String message, LocalDateTime creationDate) {
         this.userId = userId;
         this.orderId = orderId;
         this.message = message;

@@ -3,8 +3,6 @@ package cest.la.vie.rest;
 import cest.la.vie.persistence.OrderRepository;
 import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.model.Order;
-import cest.la.vie.persistence.model.ProductMongo;
-import cest.la.vie.persistence.model.Comment;
 import cest.la.vie.persistence.model.User;
 import cest.la.vie.persistence.model.Session;
 import jakarta.ws.rs.*;
@@ -48,9 +46,7 @@ public class OrderResource {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("L'utente non ha il permesso di fare questa azione.").build();
             }
 
-            // Aggiunge l'ordine
-            // Converte l'ID dell'utente in ObjectId se necessario
-            order.setUserId(user.getId()); // Converte l'ID utente in ObjectId
+            System.out.println(order);
             orderRepository.addOrder(order);
 
             return Response.status(Response.Status.CREATED).entity("Order created successfully!").build();
