@@ -108,5 +108,19 @@ public class UserResource {
         }
     }
 
+    @GET
+    @Path("/fromSession")
+    public Response getId(@Context HttpHeaders httpHeaders){
+        // Prende il cookie di sessione
+        Cookie sessionCookie = httpHeaders.getCookies().get("SESSION_ID");
+        if (sessionCookie == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Session not found. Please log in.").build();
+        }
 
+        // Prende l'utente dalla sessione
+        Optional<Session> session=sessionRepository.findBySessionKey(sessionCookie.getValue());
+        User u=session.get().getUser();
+
+        return Response.status(Response.Status.OK).entity(u.getId()).build();
+    }
 }
