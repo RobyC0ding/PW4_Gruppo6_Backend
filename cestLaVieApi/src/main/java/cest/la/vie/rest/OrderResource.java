@@ -1,11 +1,13 @@
 package cest.la.vie.rest;
 
 import cest.la.vie.persistence.OrderRepository;
+import cest.la.vie.persistence.ProductRepository;
 import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.model.Order;
 import cest.la.vie.persistence.model.Product;
 import cest.la.vie.persistence.model.User;
 import cest.la.vie.persistence.model.Session;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
@@ -23,10 +25,12 @@ public class OrderResource {
 
     private final OrderRepository orderRepository;
     private final SessionRepository sessionRepository;
+    private final ProductRepository productRepository;
 
-    public OrderResource(OrderRepository orderRepository, SessionRepository sessionRepository) {
+    public OrderResource(OrderRepository orderRepository, SessionRepository sessionRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.sessionRepository = sessionRepository;
+        this.productRepository = productRepository;
     }
 
     @POST
@@ -124,6 +128,7 @@ public class OrderResource {
     @PUT
     @Path("/{id}/status")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
     public Response updateOrderStatus(@PathParam("id") String id, @QueryParam("status") String status) {
         try {
             Order order = orderRepository.findById(new ObjectId(id));
@@ -133,7 +138,7 @@ public class OrderResource {
 
             if ("accepted".equalsIgnoreCase(status)) {
                 for (Product product : order.getProducts()) {
-                    Product dbProduct = Product.findById(product.getId());
+                    Product dbProduct = productRepository.findByName(product.getName());
                     if (dbProduct != null) {
                         int newQuantity = dbProduct.getQuantity() - product.getQuantity();
                         if (newQuantity < 0) {
@@ -151,6 +156,7 @@ public class OrderResource {
 
             // Aggiorna lo stato dell'ordine
             boolean updated = orderRepository.updateOrderStatus(new ObjectId(id), status);
+
             if (!updated) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Order not found").build();
             }
