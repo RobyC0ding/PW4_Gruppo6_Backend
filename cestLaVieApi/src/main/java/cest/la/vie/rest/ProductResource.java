@@ -5,7 +5,9 @@ import cest.la.vie.persistence.ProductHasIngredientRepository;
 import cest.la.vie.persistence.ProductRepository;
 import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.model.*;
+import cest.la.vie.rest.model.ProductRequest;
 import cest.la.vie.rest.model.ProductResponse;
+import cest.la.vie.service.ProductService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
@@ -19,12 +21,15 @@ public class ProductResource {
 
     private final ProductHasIngredientRepository productHasIngredientRepository;
     private final IngredientRepository ingredientRepository;
+    private final ProductService productService;
 
-    public ProductResource(ProductRepository productRepository, SessionRepository sessionRepository, ProductHasIngredientRepository productHasIngredientRepository, IngredientRepository ingredientRepository) {
+    public ProductResource(ProductRepository productRepository, SessionRepository sessionRepository, ProductHasIngredientRepository productHasIngredientRepository, IngredientRepository ingredientRepository, ProductService productService) {
         this.productRepository = productRepository;
         this.sessionRepository = sessionRepository;
         this.productHasIngredientRepository = productHasIngredientRepository;
         this.ingredientRepository = ingredientRepository;
+
+        this.productService = productService;
     }
 
 
@@ -95,7 +100,7 @@ public class ProductResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@Context HttpHeaders httpHeaders, Product product) {
+    public Response create(@Context HttpHeaders httpHeaders, ProductRequest product) {
         try {
             // Prende il cookie di sessione
             Cookie sessionCookie = httpHeaders.getCookies().get("SESSION_ID");
@@ -117,8 +122,10 @@ public class ProductResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Prodotto con nome identico già presente").build();
             }
 
+            //converte il productRequest in product
+            Product p=productService.convertToProduct(product);
             // Crea il prodotto
-            productRepository.addProduct(product);
+            productRepository.addProduct(p);
             return Response.status(Response.Status.CREATED).entity("Product created successfully!").build();
 
         } catch (Exception e) {
@@ -128,7 +135,7 @@ public class ProductResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-        public Response modify(@Context HttpHeaders httpHeaders, Product product){
+        public Response modify(@Context HttpHeaders httpHeaders, ProductRequest productRequest){
         try {
             // Prende il cookie di sessione
             Cookie sessionCookie = httpHeaders.getCookies().get("SESSION_ID");
@@ -144,6 +151,9 @@ public class ProductResource {
             if(user.getRole()!= User.Role.A){
                 return Response.status(Response.Status.UNAUTHORIZED).entity("L'utente non ha il permesso di fare questa azione.").build();
             }
+
+            //converte il productRequest in product
+            Product product=productService.convertToProduct(productRequest);
 
             // Recupera il prodotto esistente
             Product existingProduct = productRepository.findById(product.getId());
