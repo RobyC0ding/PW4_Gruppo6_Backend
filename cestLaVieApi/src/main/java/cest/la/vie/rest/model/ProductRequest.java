@@ -5,6 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class ProductRequest {
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @JsonProperty("editId")
+    private Long id;
+
     @JsonProperty("name")
     private String name;
 
@@ -70,5 +82,17 @@ public class ProductRequest {
 
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductRequest{" +
+                "name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", quantity='" + quantity + '\'' +
+                ", description='" + description + '\'' +
+                ", category='" + category + '\'' +
+                ", ingredients=" + ingredients +
+                '}';
     }
 }

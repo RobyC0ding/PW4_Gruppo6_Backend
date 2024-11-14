@@ -32,6 +32,6 @@ public class ProductRepository implements PanacheRepository<Product> {
     }
 
     public void updateProduct(Product product) {
-        getEntityManager().merge(product);
+        persist(product);
     }
 }

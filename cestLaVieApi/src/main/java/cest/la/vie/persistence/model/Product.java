@@ -78,4 +78,16 @@ public class Product extends PanacheEntityBase {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }

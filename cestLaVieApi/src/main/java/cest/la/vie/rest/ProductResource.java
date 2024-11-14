@@ -8,6 +8,7 @@ import cest.la.vie.persistence.model.*;
 import cest.la.vie.rest.model.ProductRequest;
 import cest.la.vie.rest.model.ProductResponse;
 import cest.la.vie.service.ProductService;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
@@ -100,6 +101,7 @@ public class ProductResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
     public Response create(@Context HttpHeaders httpHeaders, ProductRequest product) {
         try {
             // Prende il cookie di sessione
@@ -135,6 +137,7 @@ public class ProductResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
         public Response modify(@Context HttpHeaders httpHeaders, ProductRequest productRequest){
         try {
             // Prende il cookie di sessione
@@ -169,7 +172,7 @@ public class ProductResource {
 
             // Aggiorna il prodotto nel db
             productRepository.updateProduct(existingProduct);
-            return Response.status(Response.Status.CREATED).entity("Product updated successfully!").build();
+            return Response.status(Response.Status.CREATED).entity("{\"message\": \"Product updated successfully!\"}").type(MediaType.APPLICATION_JSON).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to update product: " + e.getMessage()).build();
         }

@@ -19,6 +19,9 @@ public class ProductService {
 
     public Product convertToProduct(ProductRequest productRequest) {
         Product product = new Product();
+        if(productRequest.getId()!=null){
+            product.setId(productRequest.getId());
+        }
         product.setName(productRequest.getName());
         product.setPrice(Double.parseDouble(productRequest.getPrice().replace("€", "").trim()));
         product.setQuantity(Integer.parseInt(productRequest.getQuantity()));

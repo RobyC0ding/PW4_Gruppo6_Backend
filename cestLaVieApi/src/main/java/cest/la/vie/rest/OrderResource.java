@@ -3,6 +3,7 @@ package cest.la.vie.rest;
 import cest.la.vie.persistence.OrderRepository;
 import cest.la.vie.persistence.SessionRepository;
 import cest.la.vie.persistence.model.Order;
+import cest.la.vie.persistence.model.Product;
 import cest.la.vie.persistence.model.User;
 import cest.la.vie.persistence.model.Session;
 import jakarta.ws.rs.*;
@@ -125,16 +126,42 @@ public class OrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrderStatus(@PathParam("id") String id, @QueryParam("status") String status) {
         try {
+            Order order = orderRepository.findById(new ObjectId(id));
+            if (order == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Order not found").build();
+            }
+
+            if ("accepted".equalsIgnoreCase(status)) {
+                for (Product product : order.getProducts()) {
+                    Product dbProduct = Product.findById(product.getId());
+                    if (dbProduct != null) {
+                        int newQuantity = dbProduct.getQuantity() - product.getQuantity();
+                        if (newQuantity < 0) {
+                            return Response.status(Response.Status.BAD_REQUEST)
+                                    .entity("Insufficient stock for product: " + dbProduct.getName()).build();
+                        }
+                        dbProduct.setQuantity(newQuantity);
+                        dbProduct.persist(); // Salva l'aggiornamento nel database
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND)
+                                .entity("Product not found in the database: " + product.getId()).build();
+                    }
+                }
+            }
+
             // Aggiorna lo stato dell'ordine
             boolean updated = orderRepository.updateOrderStatus(new ObjectId(id), status);
             if (!updated) {
                 return Response.status(Response.Status.NOT_FOUND).entity("Order not found").build();
             }
+
             return Response.status(Response.Status.OK).entity("Order status updated successfully").build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error updating order status: " + e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error updating order status: " + e.getMessage()).build();
         }
     }
+
 
     @GET
     @Path("/all")
