@@ -102,4 +102,27 @@ public class AuthenticationResource {
         }
 
     }
+
+    @POST
+    @Path("/logout")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response logout(@CookieParam("SESSION_ID") String sessionId) {
+        // Controlla se il cookie di sessione esiste
+        if (sessionId == null || sessionId.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Nessuna sessione trovata. Effettua prima il login.").build();
+        }
+
+        // Cerca la sessione nel repository
+        boolean sessionRemoved = sessionService.invalidateSession(sessionId);
+        if (sessionRemoved) {
+            // Rimuove il cookie dal client impostandolo con max-age 0
+            NewCookie expiredCookie = new NewCookie("SESSION_ID", null, "/", null, null, 0, false);
+            return Response.ok().cookie(expiredCookie).entity("Logout effettuato con successo").build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Sessione non trovata o già terminata").build();
+        }
+    }
+
+
 }

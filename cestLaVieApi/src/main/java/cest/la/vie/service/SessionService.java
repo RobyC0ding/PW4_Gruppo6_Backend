@@ -5,6 +5,8 @@ import cest.la.vie.persistence.model.Session;
 import cest.la.vie.persistence.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.Optional;
+
 @ApplicationScoped
 public class SessionService {
 
@@ -20,6 +22,15 @@ public class SessionService {
         Session verificationSession = new Session(user);
         sessionRepository.persist(verificationSession);
         return verificationSession;
+    }
+
+    public boolean invalidateSession(String sessionId) {
+        Optional<Session> sessionOpt = sessionRepository.findBySessionKey(sessionId);
+        if (sessionOpt.isPresent()) {
+            sessionRepository.delete(sessionOpt.get());
+            return true;
+        }
+        return false;
     }
 
 }
