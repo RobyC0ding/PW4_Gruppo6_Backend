@@ -87,9 +87,26 @@ public class UserResource {
 
     }
 
-    /*@GET
+    @GET
     @Path("/role")
-    public*/
+    public Response getRole(@Context HttpHeaders httpHeaders){
+        // Prende il cookie di sessione
+        Cookie sessionCookie = httpHeaders.getCookies().get("SESSION_ID");
+        if (sessionCookie == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Session not found. Please log in.").build();
+        }
+
+        // Prende l'utente dalla sessione
+        Optional<Session> session=sessionRepository.findBySessionKey(sessionCookie.getValue());
+        User u=session.get().getUser();
+
+        // Verifica se l'utente è un admin
+        if(u.getRole()== User.Role.A){
+            return Response.status(Response.Status.OK).entity("Admin").build();
+        }else{
+            return Response.status(Response.Status.OK).entity("Client").build();
+        }
+    }
 
 
 }
