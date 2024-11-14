@@ -58,13 +58,8 @@ public class OrderResource {
             System.out.println(existingOrders);
 
             for (Order existingOrder : existingOrders) {
-                System.out.println("ciao stato:"+existingOrder.getStatus());
-                System.out.println(!existingOrder.getStatus().equals(Order.Status.REFUSED.getValue()));
-                System.out.println(!existingOrder.getStatus().equals(Order.Status.READY.getValue()));
-                System.out.println((existingOrder.getPickupDate().equals(order.getPickupDate()))+ " ex:"+existingOrder.getPickupDate()+ " my:"+order.getPickupDate());
                 if (!existingOrder.getStatus().equals(Order.Status.REFUSED.getValue()) &&
-                        !existingOrder.getStatus().equals(Order.Status.READY.getValue()) && existingOrder.getPickupDate().equals(order.getPickupDate())) {
-                    System.out.println("urca");
+                        !existingOrder.getStatus().equals(Order.Status.TAKEN.getValue()) && existingOrder.getPickupDate().equals(order.getPickupDate())) {
                     //Converte la stringa del pickupTime in numero
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                     LocalTime pickupTime = LocalTime.parse(existingOrder.getPickupTime(), formatter);

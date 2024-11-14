@@ -119,8 +119,7 @@ public class Order extends PanacheMongoEntityBase {
         PENDING("pending"),
         ACCEPTED("accepted"),
         REFUSED("refused"),
-        MAKING("making"),
-        READY("ready");
+        TAKEN("taken");
 
         private final String value;
 

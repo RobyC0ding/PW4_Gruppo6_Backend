@@ -1,5 +1,6 @@
 package cest.la.vie.persistence;
 
+import cest.la.vie.persistence.model.Comment;
 import cest.la.vie.persistence.model.Order;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import org.bson.types.ObjectId;
@@ -39,4 +40,16 @@ public class OrderRepository implements PanacheMongoRepository<Order> {
     public List<Order> getAll() {
         return listAll();
     }
+
+    //
+    public void addComment(ObjectId orderId, Comment comment) {
+        Order order = findById(orderId);
+        if (order != null) {
+            // Aggiunge il commento alla lista dei commenti dell'ordine
+            order.getComments().add(comment);
+            update(order);  // Aggiorna l'ordine nel database
+        }
+    }
+
+
 }

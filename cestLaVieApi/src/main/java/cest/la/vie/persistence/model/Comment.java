@@ -1,11 +1,13 @@
 package cest.la.vie.persistence.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import io.quarkus.mongodb.panache.common.MongoEntity;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 
+@MongoEntity(collection = "comments")
 public class Comment extends PanacheMongoEntity {
 
     @BsonProperty("_id")
