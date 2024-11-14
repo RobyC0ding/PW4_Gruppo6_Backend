@@ -10,6 +10,10 @@ import jakarta.ws.rs.core.*;
 
 import org.bson.types.ObjectId;
 
+import java.sql.Time;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +51,39 @@ public class OrderResource {
             }
 
             System.out.println(order.toString());
+
+            // Trova tutti gli ordini tranne quelli con stato "refused" o "taken"
+            List<Order> existingOrders = orderRepository.getAll();
+
+            System.out.println(existingOrders);
+
+            for (Order existingOrder : existingOrders) {
+                System.out.println("ciao stato:"+existingOrder.getStatus());
+                System.out.println(!existingOrder.getStatus().equals(Order.Status.REFUSED.getValue()));
+                System.out.println(!existingOrder.getStatus().equals(Order.Status.READY.getValue()));
+                System.out.println((existingOrder.getPickupDate().equals(order.getPickupDate()))+ " ex:"+existingOrder.getPickupDate()+ " my:"+order.getPickupDate());
+                if (!existingOrder.getStatus().equals(Order.Status.REFUSED.getValue()) &&
+                        !existingOrder.getStatus().equals(Order.Status.READY.getValue()) && existingOrder.getPickupDate().equals(order.getPickupDate())) {
+                    System.out.println("urca");
+                    //Converte la stringa del pickupTime in numero
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                    LocalTime pickupTime = LocalTime.parse(existingOrder.getPickupTime(), formatter);
+                    int totalSeconds = pickupTime.toSecondOfDay() ;
+
+                    //Converte la stringa in numero
+                    LocalTime myOderPickupTime = LocalTime.parse(order.getPickupTime(), formatter);
+                    int myOrderTotalSeconds = myOderPickupTime.toSecondOfDay();
+
+                    // Verifica che l'orario non si sovrapponga con gli altri ordini (10 minuti di margine)
+                    System.out.println("mio tempo:"+myOrderTotalSeconds+" altro tempo:"+totalSeconds);
+                    if (Math.abs(totalSeconds - myOrderTotalSeconds) <= 600) {
+                        // Se la differenza è minore o uguale a 600 secondi, c'è una sovrapposizione
+                        return Response.status(Response.Status.BAD_REQUEST).entity("Order time overlaps with another order. Please choose a different time.").build();
+                    }
+
+                }
+            }
+
             orderRepository.addOrder(order);
 
             return Response.status(Response.Status.CREATED).entity("Order created successfully!").build();
@@ -102,5 +139,12 @@ public class OrderResource {
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error updating order status: " + e.getMessage()).build();
         }
+    }
+
+    @GET
+    @Path("/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllOrders(){
+        return Response.status(Response.Status.OK).entity(orderRepository.getAll()).build();
     }
 }

@@ -2,7 +2,9 @@ package cest.la.vie.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import io.quarkus.mongodb.panache.PanacheMongoEntityBase;
 import io.quarkus.mongodb.panache.common.MongoEntity;
+import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
@@ -11,12 +13,23 @@ import java.util.List;
 
 
 @MongoEntity(collection = "orders")
-public class Order extends PanacheMongoEntity {
+public class Order extends PanacheMongoEntityBase {
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    @BsonId
+    private ObjectId id;
 
 
     @BsonProperty("user_id")
     @JsonProperty("user_id")
-    private Integer sqluserId;
+    private Integer userId;
     @BsonProperty("pickup_date")
     @JsonProperty("pickup_date")
     private Instant pickupDate;
@@ -54,21 +67,12 @@ public class Order extends PanacheMongoEntity {
         this.comments = comments;
         this.products = products;
     }
-
-    public ObjectId getUserId() {
-        return id;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUserId(ObjectId id) {
-        this.id = id;
-    }
-
-    public Integer getSqluserId() {
-        return sqluserId;
-    }
-
-    public void setSqluserId(Integer sqluserId) {
-        this.sqluserId = sqluserId;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public Instant getPickupDate() {
@@ -132,7 +136,7 @@ public class Order extends PanacheMongoEntity {
     @Override
     public String toString() {
         return "Order{" +
-                "sqluserId=" + sqluserId +
+                "sqluserId=" + userId +
                 ", pickupDate=" + pickupDate +
                 ", pickupTime='" + pickupTime + '\'' +
                 ", creationDate=" + creationDate +

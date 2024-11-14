@@ -3,7 +3,6 @@ package cest.la.vie.persistence;
 import cest.la.vie.persistence.model.Order;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import org.bson.types.ObjectId;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
@@ -15,12 +14,12 @@ public class OrderRepository implements PanacheMongoRepository<Order> {
         persist(order);
     }
 
-    // Modifica stato di un ordine
+    // Modifica lo stato di un ordine
     public boolean updateOrderStatus(ObjectId orderId, String status) {
         Order order = findById(orderId);
         if (order != null) {
             order.setStatus(status);
-            persist(order);
+            update(order);
             return true;
         }
         return false;
@@ -34,5 +33,10 @@ public class OrderRepository implements PanacheMongoRepository<Order> {
     // Trova tutti gli ordini con uno stato specifico
     public List<Order> findOrdersByStatus(String status) {
         return list("status", status);
+    }
+
+    // Trova tutti gli ordini
+    public List<Order> getAll() {
+        return listAll();
     }
 }
