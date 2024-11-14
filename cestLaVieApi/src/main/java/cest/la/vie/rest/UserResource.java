@@ -87,4 +87,9 @@ public class UserResource {
 
     }
 
+    /*@GET
+    @Path("/role")
+    public*/
+
+
 }
