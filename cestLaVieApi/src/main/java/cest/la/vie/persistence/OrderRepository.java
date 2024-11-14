@@ -27,7 +27,7 @@ public class OrderRepository implements PanacheMongoRepository<Order> {
     }
 
     // Trova tutti gli ordini di un utente
-    public List<Order> findOrdersByUser(ObjectId userId) {
+    public List<Order> findOrdersByUser(Integer userId) {
         return list("userId", userId);
     }
 

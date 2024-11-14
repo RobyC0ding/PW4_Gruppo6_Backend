@@ -110,7 +110,7 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrdersByUser(@PathParam("userId") String userId) {
         try {
-            List<Order> orders = orderRepository.findOrdersByUser(new ObjectId(userId));
+            List<Order> orders = orderRepository.findOrdersByUser(Integer.valueOf(userId));
             if (orders.isEmpty()) {
                 return Response.status(Response.Status.NOT_FOUND).entity("No orders found for this user").build();
             }
