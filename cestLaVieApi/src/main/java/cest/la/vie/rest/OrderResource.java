@@ -52,6 +52,7 @@ public class OrderResource {
 
             // Verifica se l'utente ha il permesso di fare un ordine
             if (user.getRole() != User.Role.C) {
+                System.out.println("CIAO13");
                 return Response.status(Response.Status.UNAUTHORIZED).entity("L'utente non ha il permesso di fare questa azione.").build();
             }
 
@@ -138,7 +139,8 @@ public class OrderResource {
 
             if ("accepted".equalsIgnoreCase(status)) {
                 for (Product product : order.getProducts()) {
-                    Product dbProduct = productRepository.findByName(product.getName());
+                    Product dbProduct = productRepository.findById(product.getId());
+                    System.out.println(dbProduct);
                     if (dbProduct != null) {
                         int newQuantity = dbProduct.getQuantity() - product.getQuantity();
                         if (newQuantity < 0) {
