@@ -41,12 +41,13 @@ public class AuthenticationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response register(User user) {
+        System.out.println("user"+user);
         // Controllo se l'email è già registrata
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent() && user.getEmail().length()!=0) {
             return Response.status(Response.Status.CONFLICT).entity("Email già registrata").build();
         }
         // Controllo se il numero di telefono è già registrato
-        if (userRepository.findByPhone(user.getPhoneNumber()).isPresent()) {
+        if (userRepository.findByPhone(user.getPhoneNumber()).isPresent() && user.getPhoneNumber().length()!=0) {
             return Response.status(Response.Status.CONFLICT).entity("Telefono già registrata").build();
         }
 

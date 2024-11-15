@@ -22,8 +22,8 @@ public class UserRepository implements PanacheRepository<User> {
     }
 
     // Nuovo metodo per ottenere gli utenti con il numero di telefono non nullo
-    public List<User> findUsersWithPhone() {
-        return list("phoneNumber IS NOT NULL");
+    public List<User> findUsersWithPhoneAndNotVerified() {
+        return list("phoneNumber IS NOT NULL AND (email IS NULL OR email = '') AND isVerified = false");
     }
 
 }

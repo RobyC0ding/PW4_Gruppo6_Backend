@@ -101,5 +101,17 @@ public class User extends PanacheEntityBase {
         this.role = role;
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", password='" + password + '\'' +
+                ", isVerified=" + isVerified +
+                ", role=" + role +
+                '}';
+    }
 }

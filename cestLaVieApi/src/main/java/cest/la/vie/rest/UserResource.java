@@ -2,6 +2,7 @@ package cest.la.vie.rest;
 
 import cest.la.vie.persistence.*;
 import cest.la.vie.rest.model.UserResponse;
+import cest.la.vie.rest.model.AdminSetVerifiedRequest;
 import cest.la.vie.service.*;
 import cest.la.vie.persistence.model.Session;
 import cest.la.vie.persistence.model.User;
@@ -75,7 +76,8 @@ public class UserResource {
         }
 
         //Prende solo gli utenti che hanno il numero di telefono e non la email
-        List<User> users= userRepository.findUsersWithPhone();
+        List<User> users= userRepository.findUsersWithPhoneAndNotVerified();
+        System.out.println(users);
 
         // Converte la lista di utenti in una lista di UtenteResponse
         List<UserResponse> response = users.stream()
@@ -123,4 +125,49 @@ public class UserResource {
 
         return Response.status(Response.Status.OK).entity(u.getId()).build();
     }
+
+    @PUT
+    @Path("/adminVerify")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response adminSetUserVerified(@Context HttpHeaders httpHeaders, AdminSetVerifiedRequest userRequest) {
+        System.out.println("CIAOOOO "+userRequest);
+        // Prende il cookie di sessione
+        Cookie sessionCookie = httpHeaders.getCookies().get("SESSION_ID");
+        if (sessionCookie == null) {
+            System.out.println("CIAOOOO2");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Session not found. Please log in.").build();
+        }
+
+        // Prende l'utente dalla sessione
+        Optional<Session> session = sessionRepository.findBySessionKey(sessionCookie.getValue());
+        if (session.isEmpty()) {
+            System.out.println("CIAOOOO3");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid session.").build();
+        }
+        User adminUser = session.get().getUser();
+
+        // Verifica se l'utente è un admin
+        if (adminUser.getRole() != User.Role.A) {
+            System.out.println("CIAOOOO4");
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied. Only admins can verify users.").build();
+        }
+
+        // Trova l'utente da verificare
+        System.out.println(userRequest.getPhone_number());
+        Optional<User> userToVerify = userRepository.findByPhone(userRequest.getPhone_number());
+        if (userToVerify.isEmpty()) {
+            System.out.println("CIAOOOO5");
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found.").build();
+        }
+        User user = userToVerify.get();
+
+        // Imposta l'utente come verificato
+        user.setVerified(true);
+        userRepository.persist(user);
+
+        return Response.status(Response.Status.OK).entity("User successfully verified.").build();
+    }
+
+
 }
